@@ -820,7 +820,13 @@ static int EmbedBrowserObject(webview_t w) {
   if (OleSetContainedObject((struct IUnknown *)(*browser), TRUE) != S_OK) {
     goto error;
   }
-  GetClientRect(wv->hwnd, &rect);
+  
+  if(wv->frameless) {
+    GetWindowRect(wv->hwnd, &rect);
+  } else {
+    GetClientRect(wv->hwnd, &rect);
+  }
+  
   if ((*browser)->lpVtbl->DoVerb((*browser), OLEIVERB_SHOW, NULL,
                                  (IOleClientSite *)_iOleClientSiteEx, -1,
                                  wv->hwnd, &rect) != S_OK) {
@@ -834,8 +840,8 @@ static int EmbedBrowserObject(webview_t w) {
 
   webBrowser2->lpVtbl->put_Left(webBrowser2, 0);
   webBrowser2->lpVtbl->put_Top(webBrowser2, 0);
-  webBrowser2->lpVtbl->put_Width(webBrowser2, rect.right);
-  webBrowser2->lpVtbl->put_Height(webBrowser2, rect.bottom);
+  webBrowser2->lpVtbl->put_Width(webBrowser2, rect.right - rect.left);
+  webBrowser2->lpVtbl->put_Height(webBrowser2, rect.bottom - rect.top);
   webBrowser2->lpVtbl->Release(webBrowser2);
 
   return 0;
@@ -942,9 +948,17 @@ LRESULT CALLBACK wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (browser->lpVtbl->QueryInterface(browser, iid_unref(&IID_IWebBrowser2),
                                         (void **)&webBrowser2) == S_OK) {
       RECT rect;
-      GetClientRect(hwnd, &rect);
-      webBrowser2->lpVtbl->put_Width(webBrowser2, rect.right);
-      webBrowser2->lpVtbl->put_Height(webBrowser2, rect.bottom);
+      if(wv->frameless) {
+        GetWindowRect(hwnd, &rect);
+      } else {
+        GetClientRect(hwnd, &rect);
+      }
+
+      UINT width = rect.right - rect.left;
+      UINT height = rect.bottom - rect.top;
+      
+      webBrowser2->lpVtbl->put_Width(webBrowser2, width);
+      webBrowser2->lpVtbl->put_Height(webBrowser2, height);
     }
     return TRUE;
   }

@@ -44,7 +44,9 @@ fn main() {
         } else {
             build.file("webview_mshtml.c");
 
-            for &lib in &["ole32", "comctl32", "oleaut32", "uuid", "gdi32", "user32"] {
+            for &lib in &[
+                "ole32", "comctl32", "oleaut32", "uuid", "gdi32", "user32", "advapi32",
+            ] {
                 println!("cargo:rustc-link-lib={}", lib);
             }
         }

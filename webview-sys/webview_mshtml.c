@@ -17,6 +17,7 @@
 #pragma comment(lib, "uuid.lib")
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "user32.lib")
+#pragma comment(lib, "advapi32.lib")
 
 // For GCC.
 #ifndef DPI_AWARENESS_CONTEXT_SYSTEM_AWARE
